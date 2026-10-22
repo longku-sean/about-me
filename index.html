@@ -1,0 +1,1360 @@
+好的，我明白了。您希望點擊 DC 按鈕後，動畫播完直接跳轉到 Discord 頁面，而不是開啟新分頁。
+
+我幫您把 window.open 改成了 window.location.href，這樣動畫結束後就會直接在當前頁面跳轉。
+
+以下是完整的程式碼：
+
+```html
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <meta name="theme-color" content="#0b0e14">
+  <meta name="description" content="龍谷 longku 的個人頁面 — 三角洲行動數據與 Minecraft 水晶PvP 段位">
+  <title>龍谷 longku · 個人頁</title>
+
+  <link rel="preconnect" href="https://cdnjs.cloudflare.com" crossorigin>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+  <style>
+    :root {
+      --bg-deep: #0b0e14;
+      --bg-card: rgba(16, 24, 36, 0.78);
+      --bg-inner: rgba(8, 14, 24, 0.5);
+      --bg-stat: rgba(0, 10, 25, 0.2);
+      --bg-row: rgba(0, 0, 0, 0.15);
+      --border-soft: rgba(70, 130, 220, 0.1);
+      --border-mid: rgba(70, 130, 220, 0.18);
+      --text-primary: #e8edf5;
+      --text-secondary: #90b4e6;
+      --text-muted: #7a9ed0;
+      --text-dim: #5b7da0;
+      --accent: #5f8ee6;
+      --accent-bright: #4a8aff;
+      --gold: #ffd966;
+      --heart: #ff6b8a;
+      --heart-deep: #ff4d7a;
+      --radius-card: 2.8rem;
+      --radius-inner: 2rem;
+      --radius-stat: 1.4rem;
+      --radius-pill: 3rem;
+      --shadow-card: 0 30px 55px -12px rgba(0, 0, 0, 0.9);
+      --ease-smooth: cubic-bezier(0.25, 0.46, 0.45, 0.94);
+      --ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
+    }
+
+    *,
+    *::before,
+    *::after {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    html {
+      -webkit-text-size-adjust: 100%;
+    }
+
+    body {
+      background: #000;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      min-height: 100dvh;
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Noto Sans TC', sans-serif;
+      font-feature-settings: 'cv02', 'cv03', 'cv04', 'cv11';
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+      padding: 1.5rem;
+      color: var(--text-primary);
+      overflow-x: hidden;
+      position: relative;
+    }
+
+    /* ===== 黑洞背景 ===== */
+    .blackhole-bg {
+      position: fixed;
+      inset: 0;
+      z-index: 0;
+      overflow: hidden;
+      pointer-events: none;
+      background: radial-gradient(ellipse at center, #070a12 0%, #000 65%);
+      background-image:
+        radial-gradient(1.5px 1.5px at 12% 22%, rgba(200, 220, 255, 0.8), transparent),
+        radial-gradient(1px 1px at 28% 68%, rgba(180, 210, 255, 0.6), transparent),
+        radial-gradient(1.5px 1.5px at 45% 15%, rgba(220, 230, 255, 0.7), transparent),
+        radial-gradient(1px 1px at 63% 82%, rgba(180, 210, 255, 0.5), transparent),
+        radial-gradient(1.5px 1.5px at 78% 35%, rgba(200, 220, 255, 0.7), transparent),
+        radial-gradient(1px 1px at 88% 72%, rgba(180, 210, 255, 0.6), transparent),
+        radial-gradient(1px 1px at 35% 45%, rgba(220, 230, 255, 0.5), transparent),
+        radial-gradient(1.5px 1.5px at 55% 55%, rgba(200, 220, 255, 0.6), transparent),
+        radial-gradient(1px 1px at 8% 88%, rgba(180, 210, 255, 0.5), transparent),
+        radial-gradient(1px 1px at 92% 18%, rgba(220, 230, 255, 0.6), transparent),
+        radial-gradient(ellipse at center, #070a12 0%, #000 65%);
+    }
+
+    .blackhole-glow {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      width: 120vmin;
+      height: 120vmin;
+      transform: translate(-50%, -50%);
+      border-radius: 50%;
+      background: conic-gradient(
+        from 0deg,
+        rgba(0, 0, 0, 0) 0deg,
+        rgba(60, 120, 255, 0.30) 60deg,
+        rgba(140, 100, 255, 0.38) 130deg,
+        rgba(0, 180, 255, 0.25) 200deg,
+        rgba(80, 60, 200, 0.30) 280deg,
+        rgba(0, 0, 0, 0) 360deg
+      );
+      filter: blur(50px);
+      opacity: 0.7;
+      animation: bhSpin 40s linear infinite;
+      mask-image: radial-gradient(circle, transparent 18%, #000 32%, #000 75%, transparent 88%);
+      -webkit-mask-image: radial-gradient(circle, transparent 18%, #000 32%, #000 75%, transparent 88%);
+      will-change: transform;
+    }
+
+    @keyframes bhSpin {
+      from { transform: translate(-50%, -50%) rotate(0deg); }
+      to   { transform: translate(-50%, -50%) rotate(360deg); }
+    }
+
+    .blackhole-core {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      width: 30vmin;
+      height: 30vmin;
+      margin: -15vmin 0 0 -15vmin;
+      border-radius: 50%;
+      background: #000;
+      box-shadow:
+        0 0 60px 20px rgba(60, 120, 255, 0.35),
+        0 0 120px 50px rgba(80, 60, 200, 0.22);
+    }
+
+    .blackhole-ring {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      width: 38vmin;
+      height: 38vmin;
+      margin: -19vmin 0 0 -19vmin;
+      border-radius: 50%;
+      border: 1.5px solid rgba(150, 200, 255, 0.4);
+      box-shadow: 0 0 20px rgba(120, 180, 255, 0.5);
+      animation: bhSpin 25s linear infinite;
+      will-change: transform;
+    }
+
+    /* ===== 卡片 ===== */
+    .card {
+      position: relative;
+      z-index: 2;
+      max-width: 860px;
+      width: 100%;
+      background: var(--bg-card);
+      backdrop-filter: blur(18px) saturate(140%);
+      -webkit-backdrop-filter: blur(18px) saturate(140%);
+      border: 1px solid var(--border-mid);
+      border-radius: var(--radius-card);
+      padding: 2.5rem 2.2rem;
+      box-shadow: var(--shadow-card), 0 0 0 1px rgba(60, 130, 230, 0.08) inset;
+      overflow: hidden;
+      animation: cardIn 0.6s var(--ease-smooth) both;
+    }
+
+    .card::before {
+      content: '';
+      position: absolute;
+      top: -50%;
+      left: 20%;
+      width: 60%;
+      height: 100%;
+      background: radial-gradient(ellipse, rgba(70, 130, 255, 0.07), transparent 70%);
+      pointer-events: none;
+    }
+
+    @keyframes cardIn {
+      from { opacity: 0; transform: translateY(16px) scale(0.985); }
+      to   { opacity: 1; transform: translateY(0) scale(1); }
+    }
+
+    /* ===== Header ===== */
+    .profile-header {
+      display: flex;
+      align-items: center;
+      gap: 1.2rem;
+      margin-bottom: 2.2rem;
+      border-bottom: 1px solid var(--border-soft);
+      padding-bottom: 1.4rem;
+      flex-wrap: wrap;
+      position: relative;
+      z-index: 1;
+    }
+
+    .about-title {
+      display: flex;
+      align-items: center;
+      gap: 0.8rem;
+      font-size: 2.6rem;
+      font-weight: 700;
+      letter-spacing: -0.025em;
+      background: linear-gradient(135deg, #d4e4ff 0%, #b8d4ff 40%, #5f92ff 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      line-height: 1.2;
+      margin-bottom: 0.6rem;
+    }
+
+    .about-title i {
+      font-size: 2.2rem;
+      color: #4f8cff;
+      filter: drop-shadow(0 0 8px rgba(70, 130, 255, 0.4));
+      -webkit-text-fill-color: initial;
+    }
+
+    .name-title {
+      width: 100%;
+    }
+
+    .name-title .name-row {
+      display: flex;
+      align-items: baseline;
+      gap: 1rem;
+      flex-wrap: wrap;
+    }
+
+    .name-title h2 {
+      font-size: 1.6rem;
+      font-weight: 600;
+      color: #b8d4ff;
+      letter-spacing: -0.01em;
+    }
+
+    .name-title .sub {
+      font-size: 0.95rem;
+      color: var(--text-secondary);
+      display: flex;
+      align-items: center;
+      gap: 0.8rem;
+      flex-wrap: wrap;
+      margin-top: 0.5rem;
+    }
+
+    .sub i {
+      color: var(--accent);
+      width: 1.4rem;
+      transition: transform 0.3s var(--ease-spring), color 0.3s;
+    }
+
+    .sub > span:hover i {
+      transform: scale(1.2);
+      color: var(--accent-bright);
+    }
+
+    .specialty-badge {
+      background: rgba(40, 80, 160, 0.25);
+      border: 1px solid rgba(70, 130, 220, 0.25);
+      border-radius: var(--radius-pill);
+      padding: 0.25rem 1.2rem;
+      font-size: 0.8rem;
+      color: #c0d8ff;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.35rem;
+      transition: all 0.3s;
+    }
+
+    .specialty-badge:hover {
+      background: rgba(60, 110, 200, 0.3);
+      border-color: var(--accent-bright);
+    }
+
+    /* ===== Accordion ===== */
+    .accordion {
+      margin: 1.8rem 0 1.2rem 0;
+      display: flex;
+      flex-direction: column;
+      gap: 1.2rem;
+    }
+
+    .accordion-item {
+      background: var(--bg-inner);
+      border: 1px solid var(--border-soft);
+      border-radius: var(--radius-inner);
+      overflow: hidden;
+      transition: border-color 0.3s, box-shadow 0.3s;
+    }
+
+    .accordion-item:hover {
+      border-color: rgba(111, 207, 151, 0.55);
+      box-shadow:
+        0 0 0 1px rgba(111, 207, 151, 0.12),
+        0 0 20px rgba(111, 207, 151, 0.22),
+        0 0 45px rgba(111, 207, 151, 0.10);
+    }
+
+    .accordion-item.active {
+      border-color: rgba(74, 138, 255, 0.35);
+    }
+
+    .accordion-item.active:hover {
+      border-color: rgba(111, 207, 151, 0.65);
+      box-shadow:
+        0 0 0 1px rgba(111, 207, 151, 0.15),
+        0 0 26px rgba(111, 207, 151, 0.3),
+        0 0 60px rgba(111, 207, 151, 0.15);
+    }
+
+    .accordion-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 1.15rem 1.6rem;
+      cursor: pointer;
+      transition: background 0.25s;
+      color: #d0e0ff;
+      font-weight: 500;
+      letter-spacing: 0.02em;
+      user-select: none;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    .accordion-header:hover {
+      background: rgba(70, 130, 220, 0.06);
+    }
+
+    .accordion-header i {
+      font-size: 1.2rem;
+      color: var(--accent);
+      transition: color 0.25s;
+    }
+
+    .accordion-header .arrow {
+      transition: transform 0.4s var(--ease-spring);
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 2.2rem;
+      height: 2.2rem;
+      border-radius: 50%;
+      background: rgba(70, 130, 220, 0.08);
+    }
+
+    .accordion-item.active .accordion-header .arrow {
+      transform: rotate(180deg);
+      background: rgba(74, 138, 255, 0.15);
+    }
+
+    .accordion-content {
+      max-height: 0;
+      overflow: hidden;
+      transition:
+        max-height 0.5s var(--ease-smooth),
+        padding 0.4s var(--ease-smooth),
+        opacity 0.3s ease;
+      padding: 0 1.6rem;
+      background: rgba(0, 0, 0, 0.1);
+      opacity: 0;
+    }
+
+    .accordion-item.active .accordion-content {
+      max-height: 1400px;
+      padding: 1.6rem 1.6rem 1.8rem 1.6rem;
+      opacity: 1;
+    }
+
+    .content-inner {
+      display: flex;
+      flex-direction: column;
+      gap: 0.8rem;
+    }
+
+    /* ===== 三角洲統計 ===== */
+    .delta-stats {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+      gap: 0.6rem 1rem;
+      background: var(--bg-stat);
+      border-radius: var(--radius-stat);
+      padding: 1.2rem;
+      border: 1px solid rgba(60, 130, 220, 0.08);
+    }
+
+    .stat-item {
+      display: flex;
+      flex-direction: column;
+      padding: 0.2rem 0;
+      transition: transform 0.25s var(--ease-spring);
+    }
+
+    .stat-item:hover {
+      transform: translateX(3px);
+    }
+
+    .stat-item .label {
+      font-size: 0.65rem;
+      text-transform: uppercase;
+      color: var(--text-muted);
+      letter-spacing: 0.06em;
+      font-weight: 500;
+    }
+
+    .stat-item .value {
+      font-size: 1.1rem;
+      font-weight: 600;
+      color: #d4e4ff;
+      line-height: 1.45;
+      font-variant-numeric: tabular-nums;
+    }
+
+    .stat-item .value .rank-big {
+      background: linear-gradient(145deg, #1f3b6a, #0b1a30);
+      border-radius: var(--radius-pill);
+      padding: 0.12rem 1.3rem;
+      font-size: 1.3rem;
+      font-weight: 700;
+      color: var(--gold);
+      border: 1px solid rgba(255, 217, 102, 0.35);
+      display: inline-block;
+      box-shadow: 0 0 18px rgba(255, 200, 50, 0.12);
+      letter-spacing: 0.02em;
+    }
+
+    .stat-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.6rem 1.8rem;
+      background: var(--bg-row);
+      border-radius: 1.2rem;
+      padding: 0.8rem 1.2rem;
+      border: 1px solid rgba(70, 130, 220, 0.05);
+      margin-top: 0.4rem;
+    }
+
+    .stat-row .stat-item {
+      flex: 1 0 auto;
+      min-width: 70px;
+    }
+
+    .delta-section-title {
+      font-size: 0.85rem;
+      color: #8db4f0;
+      display: flex;
+      align-items: center;
+      gap: 0.6rem;
+      margin-bottom: 0.4rem;
+      font-weight: 500;
+    }
+
+    .delta-section-title i {
+      color: var(--accent);
+    }
+
+    .divider-light {
+      border: none;
+      border-top: 1px solid rgba(70, 130, 220, 0.08);
+      margin: 0.5rem 0;
+    }
+
+    /* ===== Minecraft ===== */
+    .mc-rank {
+      display: flex;
+      align-items: center;
+      gap: 1.5rem;
+      flex-wrap: wrap;
+      background: var(--bg-stat);
+      border-radius: var(--radius-inner);
+      padding: 0.8rem 1.5rem;
+      border: 1px solid rgba(60, 130, 220, 0.08);
+    }
+
+    .mc-rank .rank-badge {
+      background: linear-gradient(145deg, #1f3b6a, #0b1a30);
+      border-radius: var(--radius-pill);
+      padding: 0.4rem 1.9rem;
+      font-weight: 700;
+      font-size: 1.5rem;
+      letter-spacing: 0.05em;
+      color: #b8d4ff;
+      border: 1px solid #3a7aff;
+      box-shadow: 0 0 16px rgba(50, 120, 255, 0.3);
+      font-variant-numeric: tabular-nums;
+    }
+
+    .mc-rank .rank-label {
+      color: #8fb0e6;
+      font-size: 0.9rem;
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+    }
+
+    .mc-rank i {
+      color: var(--accent);
+    }
+
+    .mc-features {
+      display: flex;
+      gap: 1.2rem;
+      flex-wrap: wrap;
+      padding: 0.4rem 0;
+    }
+
+    .mc-feature {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      font-size: 0.85rem;
+      color: #9ab8e6;
+      transition: color 0.25s;
+    }
+
+    .mc-feature:hover {
+      color: #c0d8ff;
+    }
+
+    .mc-feature i {
+      color: var(--accent);
+      width: 1.1rem;
+    }
+
+    .mc-note {
+      background: rgba(0, 20, 50, 0.25);
+      border-radius: var(--radius-stat);
+      padding: 0.5rem 1.3rem;
+      border: 1px solid rgba(70, 130, 220, 0.1);
+      color: #8db4f0;
+      font-size: 0.9rem;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.6rem;
+    }
+
+    .mc-note i {
+      color: var(--gold);
+    }
+
+    /* ===== 點讚按鈕 + 計數器 ===== */
+    .like-button-wrap {
+      margin-top: 2rem;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 0.9rem;
+    }
+
+    .like-btn {
+      background: linear-gradient(135deg, #1f3b7a, #0f2550);
+      border: 1px solid rgba(70, 130, 220, 0.25);
+      border-radius: 4rem;
+      padding: 0.95rem 2.8rem;
+      font-size: 1.2rem;
+      font-weight: 600;
+      color: #f0f5ff;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.9rem;
+      cursor: pointer;
+      transition: all 0.3s var(--ease-smooth);
+      box-shadow: 0 6px 20px rgba(0, 30, 100, 0.35);
+      letter-spacing: 0.04em;
+      font-family: inherit;
+      position: relative;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    .like-btn i {
+      font-size: 2rem;
+      color: var(--heart);
+      transition: color 0.3s, transform 0.4s var(--ease-spring);
+    }
+
+    .like-btn:hover {
+      background: linear-gradient(135deg, #2a4f96, #14326a);
+      border-color: var(--accent-bright);
+      transform: translateY(-2px);
+    }
+
+    .like-btn:hover i {
+      transform: scale(1.15);
+      color: var(--heart-deep);
+    }
+
+    .like-btn:active {
+      transform: translateY(0) scale(0.98);
+    }
+
+    .like-btn.liked {
+      background: linear-gradient(135deg, #6a1f4a, #3a0f2a);
+      border-color: rgba(255, 107, 138, 0.4);
+    }
+
+    .like-btn.liked i {
+      color: var(--heart);
+    }
+
+    .like-counter {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      font-size: 0.95rem;
+      font-weight: 500;
+      color: var(--text-secondary);
+      background: rgba(20, 40, 80, 0.35);
+      border: 1px solid rgba(70, 130, 220, 0.15);
+      border-radius: var(--radius-pill);
+      padding: 0.4rem 1.2rem;
+      transition: all 0.3s var(--ease-smooth);
+      font-variant-numeric: tabular-nums;
+    }
+
+    .like-counter i {
+      font-size: 0.9rem;
+      color: var(--heart);
+    }
+
+    .like-counter .count-number {
+      font-weight: 700;
+      color: #d4e4ff;
+      font-size: 1.05rem;
+      transition: color 0.3s, transform 0.3s var(--ease-spring);
+      display: inline-block;
+    }
+
+    .count-number.bump {
+      animation: countBump 0.35s var(--ease-spring);
+    }
+
+    @keyframes countBump {
+      0%   { transform: scale(1); }
+      45%  { transform: scale(1.35); color: var(--heart); }
+      100% { transform: scale(1); }
+    }
+
+    .like-counter.liked {
+      background: rgba(90, 25, 55, 0.35);
+      border-color: rgba(255, 107, 138, 0.3);
+    }
+
+    .like-counter.liked .count-number {
+      color: #ffb8cc;
+    }
+
+    /* ===== 社群按鈕區 (IG & Discord) ===== */
+    .social-links {
+      margin-top: 2rem;
+      padding-top: 1.5rem;
+      border-top: 1px solid rgba(70, 130, 220, 0.08);
+      display: flex;
+      justify-content: center;
+      gap: 1.2rem;
+      flex-wrap: wrap;
+    }
+
+    .social-btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 3.5rem;
+      height: 3.5rem;
+      border-radius: 50%;
+      font-size: 1.6rem;
+      text-decoration: none;
+      color: #e8edf5;
+      background: rgba(20, 40, 80, 0.4);
+      border: 1px solid rgba(70, 130, 220, 0.2);
+      backdrop-filter: blur(4px);
+      transition: all 0.3s var(--ease-spring);
+      position: relative;
+      -webkit-tap-highlight-color: transparent;
+      cursor: pointer;
+    }
+
+    .social-btn.ig:hover {
+      color: #fff;
+      background: linear-gradient(45deg, #f09433 0%, #e6683c 25%, #dc2743 50%, #cc2366 75%, #bc1888 100%);
+      border-color: transparent;
+      transform: translateY(-4px) scale(1.08);
+      box-shadow: 0 10px 25px -5px rgba(220, 39, 67, 0.6);
+    }
+
+    .social-btn.discord:hover {
+      color: #fff;
+      background: #5865F2;
+      border-color: transparent;
+      transform: translateY(-4px) scale(1.08);
+      box-shadow: 0 10px 25px -5px rgba(88, 101, 242, 0.6);
+    }
+
+    .social-btn:active {
+      transform: translateY(-1px) scale(0.95);
+    }
+
+    /* =========================================================
+       彩色相機快門動畫
+    ========================================================= */
+    .camera-flash-overlay {
+      position: fixed;
+      inset: 0;
+      z-index: 9999;
+      pointer-events: none;
+      opacity: 0;
+      background: linear-gradient(
+        135deg,
+        rgba(255, 0, 128, 0.7) 0%,
+        rgba(255, 200, 0, 0.7) 25%,
+        rgba(0, 255, 170, 0.7) 50%,
+        rgba(0, 180, 255, 0.7) 75%,
+        rgba(180, 0, 255, 0.7) 100%
+      );
+      mix-blend-mode: screen;
+    }
+
+    .camera-flash-overlay.flash {
+      animation: cameraFlashColor 0.6s ease-out forwards;
+    }
+
+    @keyframes cameraFlashColor {
+      0%   { opacity: 0; transform: scale(0.8); }
+      12%  { opacity: 1; transform: scale(1); }
+      45%  { opacity: 0.9; transform: scale(1); }
+      100% { opacity: 0; transform: scale(1.05); }
+    }
+
+    .camera-icon-pop {
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%) scale(0);
+      font-size: 6rem;
+      z-index: 10000;
+      pointer-events: none;
+      opacity: 0;
+      -webkit-text-fill-color: transparent;
+      background: linear-gradient(45deg, #ff0080, #ff8c00, #40e0d0, #1e90ff, #9b59b6);
+      -webkit-background-clip: text;
+      background-clip: text;
+      filter: drop-shadow(0 0 15px rgba(255, 100, 200, 0.8))
+              drop-shadow(0 0 30px rgba(100, 200, 255, 0.6));
+    }
+
+    .camera-icon-pop.pop {
+      animation: cameraColorPop 0.75s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+    }
+
+    @keyframes cameraColorPop {
+      0%   { opacity: 0; transform: translate(-50%, -50%) scale(0.3) rotate(-15deg); }
+      25%  { opacity: 1; transform: translate(-50%, -50%) scale(1.25) rotate(8deg); }
+      50%  { opacity: 1; transform: translate(-50%, -50%) scale(1) rotate(0deg); }
+      80%  { opacity: 1; transform: translate(-50%, -50%) scale(1) rotate(0deg); }
+      100% { opacity: 0; transform: translate(-50%, -50%) scale(1.4) rotate(10deg); }
+    }
+
+    .camera-shutter-line {
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      width: 140vmax;
+      height: 6px;
+      z-index: 10001;
+      pointer-events: none;
+      opacity: 0;
+      transform: translate(-50%, -50%) scaleX(0);
+      transform-origin: center;
+      background: linear-gradient(90deg,
+        transparent 0%,
+        #ff0080 15%,
+        #ffcc00 35%,
+        #40e0d0 55%,
+        #1e90ff 75%,
+        #9b59b6 90%,
+        transparent 100%
+      );
+      border-radius: 3px;
+      box-shadow:
+        0 0 15px rgba(255, 100, 200, 0.8),
+        0 0 30px rgba(100, 200, 255, 0.6);
+    }
+
+    .camera-shutter-line.active {
+      animation: shutterLineColor 0.5s ease-out forwards;
+    }
+
+    @keyframes shutterLineColor {
+      0%   { opacity: 0; transform: translate(-50%, -50%) scaleX(0) rotate(0deg); }
+      30%  { opacity: 1; transform: translate(-50%, -50%) scaleX(1) rotate(0deg); }
+      70%  { opacity: 1; transform: translate(-50%, -50%) scaleX(1) rotate(0deg); }
+      100% { opacity: 0; transform: translate(-50%, -50%) scaleX(1) rotate(0deg); }
+    }
+
+    /* =========================================================
+       Discord 全螢幕中央旋轉動畫
+    ========================================================= */
+    .dc-center-overlay {
+      position: fixed;
+      inset: 0;
+      z-index: 9998;
+      pointer-events: none;
+      opacity: 0;
+      background: radial-gradient(
+        circle at center,
+        rgba(88, 101, 242, 0.25) 0%,
+        rgba(88, 101, 242, 0.1) 35%,
+        rgba(0, 0, 0, 0.4) 70%,
+        transparent 100%
+      );
+      backdrop-filter: blur(0px);
+    }
+
+    .dc-center-overlay.active {
+      animation: dcOverlayFade 0.9s ease-out forwards;
+    }
+
+    @keyframes dcOverlayFade {
+      0%   { opacity: 0; backdrop-filter: blur(0px); }
+      20%  { opacity: 1; backdrop-filter: blur(6px); }
+      80%  { opacity: 1; backdrop-filter: blur(6px); }
+      100% { opacity: 0; backdrop-filter: blur(0px); }
+    }
+
+    .dc-center-icon {
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%) scale(0) rotate(0deg);
+      font-size: 10rem;
+      z-index: 9999;
+      pointer-events: none;
+      color: #fff;
+      opacity: 0;
+      filter: drop-shadow(0 0 30px rgba(88, 101, 242, 1))
+              drop-shadow(0 0 60px rgba(88, 101, 242, 0.7));
+    }
+
+    .dc-center-icon.spin {
+      animation: dcCenterSpin 0.9s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+    }
+
+    @keyframes dcCenterSpin {
+      0% {
+        opacity: 0;
+        transform: translate(-50%, -50%) scale(0.3) rotate(0deg);
+        color: #5865F2;
+      }
+      20% {
+        opacity: 1;
+        transform: translate(-50%, -50%) scale(1.1) rotate(72deg);
+        color: #5865F2;
+      }
+      50% {
+        opacity: 1;
+        transform: translate(-50%, -50%) scale(1.3) rotate(180deg);
+        color: #fff;
+      }
+      80% {
+        opacity: 1;
+        transform: translate(-50%, -50%) scale(1.1) rotate(288deg);
+        color: #5865F2;
+      }
+      100% {
+        opacity: 0;
+        transform: translate(-50%, -50%) scale(0.3) rotate(360deg);
+        color: #5865F2;
+      }
+    }
+
+    /* ===== Footer ===== */
+    .footer-note {
+      margin-top: 1.5rem;
+      font-size: 0.7rem;
+      opacity: 0.3;
+      text-align: center;
+      padding-top: 1rem;
+      color: var(--text-dim);
+      letter-spacing: 0.05em;
+    }
+
+    /* ===== 響應式 ===== */
+    @media (max-width: 600px) {
+      .card {
+        padding: 1.8rem 1.3rem;
+        border-radius: 2.2rem;
+      }
+      .about-title {
+        font-size: 2rem;
+      }
+      .about-title i {
+        font-size: 1.7rem;
+      }
+      .name-title h2 {
+        font-size: 1.3rem;
+      }
+      .accordion-header {
+        padding: 1rem 1.1rem;
+      }
+      .accordion-content {
+        padding: 0 1.1rem;
+      }
+      .accordion-item.active .accordion-content {
+        padding: 1.2rem 1.1rem 1.4rem 1.1rem;
+      }
+      .delta-stats {
+        grid-template-columns: 1fr 1fr;
+        gap: 0.5rem 0.8rem;
+        padding: 1rem;
+      }
+      .stat-item .value {
+        font-size: 1rem;
+      }
+      .mc-rank {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 0.8rem;
+        padding: 0.9rem 1.2rem;
+      }
+      .mc-rank .rank-badge {
+        font-size: 1.3rem;
+        padding: 0.35rem 1.6rem;
+      }
+      .like-btn {
+        padding: 0.85rem 2rem;
+        font-size: 1.05rem;
+      }
+      .social-btn {
+        width: 3.2rem;
+        height: 3.2rem;
+        font-size: 1.4rem;
+      }
+      .camera-icon-pop {
+        font-size: 4rem;
+      }
+      .dc-center-icon {
+        font-size: 6rem;
+      }
+    }
+
+    @media (max-width: 380px) {
+      .delta-stats {
+        grid-template-columns: 1fr;
+      }
+      .about-title {
+        font-size: 1.7rem;
+      }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      .blackhole-glow,
+      .blackhole-ring,
+      .card {
+        animation: none !important;
+      }
+      .camera-flash-overlay,
+      .camera-icon-pop,
+      .camera-shutter-line,
+      .dc-center-overlay,
+      .dc-center-icon {
+        animation: none !important;
+      }
+    }
+
+    .accordion-header:focus-visible,
+    .like-btn:focus-visible,
+    .social-btn:focus-visible {
+      outline: 2px solid var(--accent-bright);
+      outline-offset: 3px;
+    }
+
+    ::selection {
+      background: rgba(74, 138, 255, 0.35);
+      color: #fff;
+    }
+
+    ::-webkit-scrollbar {
+      width: 10px;
+    }
+    ::-webkit-scrollbar-track {
+      background: #0b0e14;
+    }
+    ::-webkit-scrollbar-thumb {
+      background: rgba(70, 130, 220, 0.25);
+      border-radius: 5px;
+      border: 2px solid #0b0e14;
+    }
+    ::-webkit-scrollbar-thumb:hover {
+      background: rgba(74, 138, 255, 0.45);
+    }
+  </style>
+</head>
+<body>
+
+  <div class="blackhole-bg" aria-hidden="true">
+    <div class="blackhole-glow"></div>
+    <div class="blackhole-core"></div>
+    <div class="blackhole-ring"></div>
+  </div>
+
+  <div class="camera-flash-overlay" id="cameraFlash" aria-hidden="true"></div>
+  <i class="fas fa-camera camera-icon-pop" id="cameraIcon" aria-hidden="true"></i>
+  <div class="camera-shutter-line" id="shutterLine" aria-hidden="true"></div>
+
+  <div class="dc-center-overlay" id="dcOverlay" aria-hidden="true"></div>
+  <i class="fab fa-discord dc-center-icon" id="dcCenterIcon" aria-hidden="true"></i>
+
+  <main class="card" role="main">
+
+    <header class="profile-header">
+      <div class="name-title">
+        <h1 class="about-title">
+          <i class="fas fa-user-astronaut" aria-hidden="true"></i>
+          About Me
+        </h1>
+        <div class="name-row">
+          <h2>龍谷 longku</h2>
+        </div>
+        <div class="sub">
+          <span><i class="fas fa-gamepad" aria-hidden="true"></i> 玩遊戲</span>
+          <span><i class="fas fa-code" aria-hidden="true"></i> 寫 code</span>
+          <span class="specialty-badge"><i class="fas fa-bolt" aria-hidden="true"></i> 特長</span>
+        </div>
+      </div>
+    </header>
+
+    <div class="accordion" role="region" aria-label="個人資訊區塊">
+
+      <section class="accordion-item active" aria-labelledby="delta-header">
+        <div class="accordion-header" id="delta-header" onclick="toggleAccordion(this)" role="button" tabindex="0" aria-expanded="true" onkeydown="handleAccordionKey(event, this)">
+          <span><i class="fas fa-map-marked-alt" style="margin-right: 0.8rem;" aria-hidden="true"></i> 關於我的三角洲</span>
+          <span class="arrow"><i class="fas fa-chevron-down" aria-hidden="true"></i></span>
+        </div>
+        <div class="accordion-content" role="region" aria-labelledby="delta-header">
+          <div class="content-inner">
+
+            <div style="display: flex; align-items: center; gap: 1rem; flex-wrap: wrap; margin-bottom: 0.3rem;">
+              <span class="delta-section-title"><i class="fas fa-trophy" aria-hidden="true"></i> 最高段位</span>
+              <span class="stat-item">
+                <span class="value"><span class="rank-big">黑鷹</span></span>
+              </span>
+              <span style="font-size:0.8rem; color:var(--text-muted); margin-left: 0.3rem; display:inline-flex; align-items:center; gap:0.3rem;">
+                <i class="fas fa-star" aria-hidden="true" style="color: var(--gold);"></i> 黑鷹 V★5
+              </span>
+            </div>
+
+            <hr class="divider-light">
+
+            <div class="delta-stats">
+              <div class="stat-item"><span class="label">對局數</span><span class="value">2359</span></div>
+              <div class="stat-item"><span class="label">遊時長</span><span class="value">395h</span></div>
+              <div class="stat-item"><span class="label">財富</span><span class="value">61</span></div>
+              <div class="stat-item"><span class="label">生存</span><span class="value">81</span></div>
+              <div class="stat-item"><span class="label">搜索</span><span class="value">72</span></div>
+              <div class="stat-item"><span class="label">合作</span><span class="value">57</span></div>
+              <div class="stat-item"><span class="label">賽季平均</span><span class="value">65</span></div>
+              <div class="stat-item"><span class="label">盈比</span><span class="value">692.3K</span></div>
+            </div>
+
+            <div class="stat-row">
+              <div class="stat-item"><span class="label">損比</span><span class="value">4.7</span></div>
+              <div class="stat-item"><span class="label">撤率</span><span class="value">35.5%</span></div>
+              <div class="stat-item"><span class="label">普通</span><span class="value">1</span></div>
+              <div class="stat-item"><span class="label">機密</span><span class="value">0.5</span></div>
+              <div class="stat-item"><span class="label">絕密</span><span class="value">0.5</span></div>
+              <div class="stat-item"><span class="label">帶出隊友價值</span><span class="value">11.5M</span></div>
+            </div>
+
+            <div class="stat-row">
+              <div class="stat-item"><span class="label">擊敗探員數</span><span class="value">2050</span></div>
+              <div class="stat-item"><span class="label">命中率</span><span class="value">25.8%</span></div>
+              <div class="stat-item"><span class="label">救助隊友</span><span class="value">347</span></div>
+              <div class="stat-item"><span class="label">49.6%</span><span class="value">—</span></div>
+              <div class="stat-item"><span class="label">復活隊友</span><span class="value">289</span></div>
+            </div>
+
+            <div style="font-size:0.75rem; color:var(--text-dim); margin-top: 0.3rem; border-top: 1px solid rgba(70,130,220,0.05); padding-top: 0.6rem; display:flex; align-items:center; gap:0.4rem;">
+              <i class="fas fa-database" aria-hidden="true"></i> 數據來源：三角洲行動 · 龍谷
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="accordion-item" aria-labelledby="mc-header">
+        <div class="accordion-header" id="mc-header" onclick="toggleAccordion(this)" role="button" tabindex="0" aria-expanded="false" onkeydown="handleAccordionKey(event, this)">
+          <span><i class="fab fa-empire" style="margin-right: 0.8rem;" aria-hidden="true"></i> Minecraft · 水晶PvP</span>
+          <span class="arrow"><i class="fas fa-chevron-down" aria-hidden="true"></i></span>
+        </div>
+        <div class="accordion-content" role="region" aria-labelledby="mc-header">
+          <div class="content-inner">
+            <div class="mc-rank">
+              <div>
+                <i class="fas fa-gem" style="font-size: 1.9rem; color: #8ab4ff;" aria-hidden="true"></i>
+              </div>
+              <div>
+                <div class="rank-label"><i class="fas fa-trophy" aria-hidden="true"></i> 水晶PvP 段位</div>
+                <div class="rank-badge">MT3</div>
+              </div>
+              <div style="margin-left: auto; font-size:0.8rem; color:var(--text-muted); display:inline-flex; align-items:center; gap:0.4rem;">
+                <i class="fas fa-bolt" aria-hidden="true"></i> MCPVP Club 風格
+              </div>
+            </div>
+
+            <div class="mc-features">
+              <span class="mc-feature"><i class="fas fa-sword" aria-hidden="true"></i> 競技場 · 水晶</span>
+              <span class="mc-feature"><i class="fas fa-users" aria-hidden="true"></i> 玩家對戰</span>
+              <span class="mc-feature"><i class="fas fa-medal" aria-hidden="true"></i> 段位 MT3</span>
+            </div>
+
+            <div class="mc-note">
+              <i class="fas fa-crown" aria-hidden="true"></i> 水晶PvP · 當前段位 MT3 (頂尖)
+            </div>
+          </div>
+        </div>
+      </section>
+    </div>
+
+    <div class="like-button-wrap">
+      <button class="like-btn" id="likeBtn" onclick="handleLike(event)" aria-label="點讚並開啟 Instagram">
+        <i class="fas fa-heart" aria-hidden="true"></i> 點讚
+      </button>
+
+      <div class="like-counter" id="likeCounter" aria-live="polite">
+        <i class="fas fa-heart" aria-hidden="true"></i>
+        <span>已獲</span>
+        <span class="count-number" id="countNumber">0</span>
+        <span>個讚</span>
+      </div>
+    </div>
+
+    <div class="social-links">
+      <a href="https://www.instagram.com/longku_lk?vrfl=MWJzMWt4OXRjbGs5aw%3D%3D&utm_source=qr" target="_blank" rel="noopener noreferrer" class="social-btn ig" id="igBtn" onclick="handleIGClick(event)" aria-label="前往 Instagram">
+        <i class="fab fa-instagram" aria-hidden="true"></i>
+      </a>
+      <a href="https://discord.gg/RTM6CPKfp4" target="_blank" rel="noopener noreferrer" class="social-btn discord" id="dcBtn" onclick="handleDCClick(event)" aria-label="前往 Discord">
+        <i class="fab fa-discord" aria-hidden="true"></i>
+      </a>
+    </div>
+
+    <footer class="footer-note">
+      <i class="fas fa-dragon" aria-hidden="true"></i> 龍谷 longku · 現代藍黑
+    </footer>
+  </main>
+
+  <script>
+    'use strict';
+
+    /* ===== 點讚計數 ===== */
+    let likeCount = Math.floor(Math.random() * 100) + 1;
+    let isLiked = false;
+    const IG_URL = 'https://www.instagram.com/longku_lk?vrfl=MWJzMWt4OXRjbGs5aw%3D%3D&utm_source=qr';
+
+    const countNumberEl = document.getElementById('countNumber');
+    const likeCounterEl = document.getElementById('likeCounter');
+
+    function initCounter() {
+      if (countNumberEl) countNumberEl.textContent = likeCount;
+    }
+
+    function updateCounter(newCount) {
+      likeCount = newCount;
+      if (!countNumberEl) return;
+      countNumberEl.textContent = likeCount;
+      countNumberEl.classList.remove('bump');
+      void countNumberEl.offsetWidth;
+      countNumberEl.classList.add('bump');
+      setTimeout(() => {
+        countNumberEl.classList.remove('bump');
+      }, 400);
+    }
+
+    /* ===== 彩色相機快門動畫 ===== */
+    const cameraFlash = document.getElementById('cameraFlash');
+    const cameraIcon = document.getElementById('cameraIcon');
+    const shutterLine = document.getElementById('shutterLine');
+
+    function playCameraAnimation() {
+      if (!cameraFlash || !cameraIcon || !shutterLine) return;
+
+      cameraFlash.classList.remove('flash');
+      cameraIcon.classList.remove('pop');
+      shutterLine.classList.remove('active');
+
+      void cameraFlash.offsetWidth;
+
+      cameraFlash.classList.add('flash');
+      cameraIcon.classList.add('pop');
+      shutterLine.classList.add('active');
+
+      if (navigator.vibrate) navigator.vibrate([20, 30, 20]);
+
+      setTimeout(() => {
+        cameraFlash.classList.remove('flash');
+        cameraIcon.classList.remove('pop');
+        shutterLine.classList.remove('active');
+      }, 800);
+    }
+
+    /* ===== Discord 中央旋轉動畫 ===== */
+    const dcOverlay = document.getElementById('dcOverlay');
+    const dcCenterIcon = document.getElementById('dcCenterIcon');
+
+    function playDiscordAnimation() {
+      if (!dcOverlay || !dcCenterIcon) return;
+
+      dcOverlay.classList.remove('active');
+      dcCenterIcon.classList.remove('spin');
+
+      void dcOverlay.offsetWidth;
+
+      dcOverlay.classList.add('active');
+      dcCenterIcon.classList.add('spin');
+
+      if (navigator.vibrate) navigator.vibrate([15, 20, 15, 20]);
+
+      setTimeout(() => {
+        dcOverlay.classList.remove('active');
+        dcCenterIcon.classList.remove('spin');
+      }, 1000);
+    }
+
+    /* ===== Accordion ===== */
+    function toggleAccordion(headerElement) {
+      const item = headerElement.closest('.accordion-item');
+      if (!item) return;
+
+      const isActive = item.classList.contains('active');
+      const parent = item.parentElement;
+      const siblings = parent.querySelectorAll('.accordion-item');
+
+      siblings.forEach(sib => {
+        if (sib !== item) {
+          sib.classList.remove('active');
+          const h = sib.querySelector('.accordion-header');
+          if (h) h.setAttribute('aria-expanded', 'false');
+        }
+      });
+
+      if (isActive) {
+        item.classList.remove('active');
+        headerElement.setAttribute('aria-expanded', 'false');
+      } else {
+        item.classList.add('active');
+        headerElement.setAttribute('aria-expanded', 'true');
+      }
+    }
+
+    function handleAccordionKey(event, headerElement) {
+      if (event.key === 'Enter' || event.key === ' ') {
+        event.preventDefault();
+        toggleAccordion(headerElement);
+      }
+    }
+
+    /* ===== 點讚 ===== */
+    function handleLike(event) {
+      const btn = document.getElementById('likeBtn');
+      if (!btn) return;
+
+      if (!isLiked) {
+        isLiked = true;
+        btn.classList.add('liked');
+        btn.innerHTML = '<i class="fas fa-heart" aria-hidden="true"></i> 已點讚 ❤️';
+        btn.setAttribute('aria-label', '已點讚，點擊取消');
+
+        if (likeCounterEl) likeCounterEl.classList.add('liked');
+        updateCounter(likeCount + 1);
+
+        playCameraAnimation();
+
+        setTimeout(() => {
+          window.open(IG_URL, '_blank', 'noopener,noreferrer');
+        }, 650);
+      } else {
+        isLiked = false;
+        btn.classList.remove('liked');
+        btn.innerHTML = '<i class="fas fa-heart" aria-hidden="true"></i> 點讚';
+        btn.setAttribute('aria-label', '點讚並開啟 Instagram');
+
+        if (likeCounterEl) likeCounterEl.classList.remove('liked');
+        updateCounter(likeCount - 1);
+      }
+    }
+
+    /* ===== IG 按鈕點擊 (彩色相機動畫) ===== */
+    function handleIGClick(event) {
+      event.preventDefault();
+      const url = event.currentTarget.href;
+
+      playCameraAnimation();
+
+      setTimeout(() => {
+        window.open(url, '_blank', 'noopener,noreferrer');
+      }, 650);
+    }
+
+    /* ===== Discord 按鈕點擊 (全螢幕中央旋轉動畫) ===== */
+    let isDcAnimating = false;
+
+    function handleDCClick(event) {
+      event.preventDefault();
+      const url = event.currentTarget.href;
+
+      if (isDcAnimating) return;
+      isDcAnimating = true;
+
+      playDiscordAnimation();
+
+      // 動畫 0.9s，等待 800ms 後直接跳轉當前頁面
+      setTimeout(() => {
+        window.location.href = url; 
+        // 注意：跳轉後頁面會刷新，所以不需要重置 isDcAnimating
+      }, 800);
+    }
+
+    /* ===== 初始同步 ===== */
+    document.addEventListener('DOMContentLoaded', () => {
+      initCounter();
+
+      document.querySelectorAll('.accordion-item').forEach(item => {
+        const header = item.querySelector('.accordion-header');
+        if (header) {
+          header.setAttribute('aria-expanded', item.classList.contains('active') ? 'true' : 'false');
+        }
+      });
+
+      const btn = document.getElementById('likeBtn');
+      if (btn) btn.setAttribute('aria-label', '點讚並開啟 Instagram');
+    });
+
+    /* ===== 防止雙擊選取 ===== */
+    document.querySelectorAll('.accordion-header, .like-btn').forEach(el => {
+      el.addEventListener('mousedown', e => {
+        if (e.detail > 1) e.preventDefault();
+      });
+    });
+  </script>
+</body>
+</html>
+```
+
+✅ 更新內容
+
+我已經將 handleDCClick 裡的跳轉方式從 window.open 改成 window.location.href：
+
+```javascript
+setTimeout(() => {
+  window.location.href = url; 
+}, 800);
+```
+
+這樣點擊 Discord 按鈕後，動畫會先播完（約 0.8 秒），然後瀏覽器會直接在當前分頁跳轉到您的 Discord 邀請連結。
