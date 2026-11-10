@@ -61,6 +61,7 @@
       min-height: 100vh;
       min-height: 100dvh;
       font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Noto Sans TC', sans-serif;
+      font-feature-settings: 'cv02', 'cv03', 'cv04', 'cv11';
       -webkit-font-smoothing: antialiased;
       -moz-osx-font-smoothing: grayscale;
       padding: 1.5rem;
@@ -290,6 +291,7 @@
       transition: border-color 0.3s, box-shadow 0.3s;
     }
 
+    /* 滑鼠懸停：綠色邊框光暈 */
     .accordion-item:hover {
       border-color: rgba(111, 207, 151, 0.55);
       box-shadow:
@@ -645,7 +647,7 @@
       color: #ffb8cc;
     }
 
-    /* ===== 社群按鈕區 (IG & Discord) ===== */
+    /* ===== 社群按鈕區 (只有 IG & Discord) ===== */
     .social-links {
       margin-top: 2rem;
       padding-top: 1.5rem;
@@ -1026,6 +1028,7 @@
 
     <div class="accordion" role="region" aria-label="個人資訊區塊">
 
+      <!-- 三角洲 -->
       <section class="accordion-item active" aria-labelledby="delta-header">
         <div class="accordion-header" id="delta-header" onclick="toggleAccordion(this)" role="button" tabindex="0" aria-expanded="true" onkeydown="handleAccordionKey(event, this)">
           <span><i class="fas fa-map-marked-alt" style="margin-right: 0.8rem;" aria-hidden="true"></i> 關於我的三角洲</span>
@@ -1034,53 +1037,65 @@
         <div class="accordion-content" role="region" aria-labelledby="delta-header">
           <div class="content-inner">
 
+            <!-- 最高段位 -->
             <div style="display: flex; align-items: center; gap: 1rem; flex-wrap: wrap; margin-bottom: 0.3rem;">
               <span class="delta-section-title"><i class="fas fa-trophy" aria-hidden="true"></i> 最高段位</span>
               <span class="stat-item">
-                <span class="value"><span class="rank-big">黑鷹</span></span>
+                <span class="value"><span class="rank-big">三角洲巔峰</span></span>
               </span>
               <span style="font-size:0.8rem; color:var(--text-muted); margin-left: 0.3rem; display:inline-flex; align-items:center; gap:0.3rem;">
-                <i class="fas fa-star" aria-hidden="true" style="color: var(--gold);"></i> 黑鷹 V★5
+                <i class="fas fa-star" aria-hidden="true" style="color: var(--gold);"></i> ★ 7 (6310)
               </span>
             </div>
 
             <hr class="divider-light">
 
+            <!-- 主要數據 -->
             <div class="delta-stats">
-              <div class="stat-item"><span class="label">對局數</span><span class="value">2359</span></div>
-              <div class="stat-item"><span class="label">遊時長</span><span class="value">395h</span></div>
-              <div class="stat-item"><span class="label">財富</span><span class="value">61</span></div>
-              <div class="stat-item"><span class="label">生存</span><span class="value">81</span></div>
-              <div class="stat-item"><span class="label">搜索</span><span class="value">72</span></div>
-              <div class="stat-item"><span class="label">合作</span><span class="value">57</span></div>
-              <div class="stat-item"><span class="label">賽季平均</span><span class="value">65</span></div>
-              <div class="stat-item"><span class="label">盈比</span><span class="value">692.3K</span></div>
+              <div class="stat-item"><span class="label">戰局數</span><span class="value">636</span></div>
+              <div class="stat-item"><span class="label">遊戲時長</span><span class="value">97h</span></div>
+              <div class="stat-item"><span class="label">財富</span><span class="value">94</span></div>
+              <div class="stat-item"><span class="label">生存</span><span class="value">69</span></div>
+              <div class="stat-item"><span class="label">戰鬥</span><span class="value">67</span></div>
+              <div class="stat-item"><span class="label">合作</span><span class="value">68</span></div>
+              <div class="stat-item"><span class="label">搜索</span><span class="value">47</span></div>
+              <div class="stat-item"><span class="label">盈虧比</span><span class="value">1.1M</span></div>
             </div>
 
+            <!-- 第二排 (戰損、撤離、帶出) -->
             <div class="stat-row">
-              <div class="stat-item"><span class="label">損比</span><span class="value">4.7</span></div>
-              <div class="stat-item"><span class="label">撤率</span><span class="value">35.5%</span></div>
-              <div class="stat-item"><span class="label">普通</span><span class="value">1</span></div>
-              <div class="stat-item"><span class="label">機密</span><span class="value">0.5</span></div>
-              <div class="stat-item"><span class="label">絕密</span><span class="value">0.5</span></div>
-              <div class="stat-item"><span class="label">帶出隊友價值</span><span class="value">11.5M</span></div>
+              <div class="stat-item"><span class="label">戰損比</span><span class="value">2.9</span></div>
+              <div class="stat-item"><span class="label">擊敗探員</span><span class="value">710</span></div>
+              <div class="stat-item"><span class="label">撤離率</span><span class="value">32.9%</span></div>
+              <div class="stat-item"><span class="label">帶出隊友價值</span><span class="value">3.6M</span></div>
+              <div class="stat-item"><span class="label">帶出價值</span><span class="value">463.5M</span></div>
+              <div class="stat-item"><span class="label">累計行動報酬</span><span class="value">350K</span></div>
             </div>
 
+            <!-- 第三排 (命中、精準、救助、復活等) -->
             <div class="stat-row">
-              <div class="stat-item"><span class="label">擊敗探員數</span><span class="value">2050</span></div>
-              <div class="stat-item"><span class="label">命中率</span><span class="value">25.8%</span></div>
-              <div class="stat-item"><span class="label">救助隊友</span><span class="value">347</span></div>
-              <div class="stat-item"><span class="label">49.6%</span><span class="value">—</span></div>
-              <div class="stat-item"><span class="label">復活隊友</span><span class="value">289</span></div>
+              <div class="stat-item"><span class="label">命中率</span><span class="value">25.2%</span></div>
+              <div class="stat-item"><span class="label">精準擊敗率</span><span class="value">58.2%</span></div>
+              <div class="stat-item"><span class="label">救助隊友</span><span class="value">107</span></div>
+              <div class="stat-item"><span class="label">復活隊友</span><span class="value">92</span></div>
+              <div class="stat-item"><span class="label">破解曼德爾磚</span><span class="value">10</span></div>
             </div>
 
-            <div style="font-size:0.75rem; color:var(--text-dim); margin-top: 0.3rem; border-top: 1px solid rgba(70,130,220,0.05); padding-top: 0.6rem; display:flex; align-items:center; gap:0.4rem;">
-              <i class="fas fa-database" aria-hidden="true"></i> 數據來源：三角洲行動 · 龍谷
+            <!-- 第四排 (戰損比細項) -->
+            <div class="stat-row">
+              <div class="stat-item"><span class="label">普通 (戰損比)</span><span class="value">2.9</span></div>
+              <div class="stat-item"><span class="label">機密 (戰損比)</span><span class="value">1.7</span></div>
+              <div class="stat-item"><span class="label">絕密 (戰損比)</span><span class="value">0.9</span></div>
+            </div>
+
+            <div style="font-size:0.75rem; color:var(--text-dim); margin-top: 0.3rem; border-top: 1px solid rgba(70,130,220,0.05); padding-top: 0.6rem; display:flex; align-items: center; gap:0.4rem;">
+              <i class="fas fa-database" aria-hidden="true"></i> 數據來源：三角洲行動 · S11群星賽季
             </div>
           </div>
         </div>
       </section>
 
+      <!-- Minecraft -->
       <section class="accordion-item" aria-labelledby="mc-header">
         <div class="accordion-header" id="mc-header" onclick="toggleAccordion(this)" role="button" tabindex="0" aria-expanded="false" onkeydown="handleAccordionKey(event, this)">
           <span><i class="fab fa-empire" style="margin-right: 0.8rem;" aria-hidden="true"></i> Minecraft · 水晶PvP</span>
@@ -1115,6 +1130,7 @@
       </section>
     </div>
 
+    <!-- 點讚按鈕 + 計數器 -->
     <div class="like-button-wrap">
       <button class="like-btn" id="likeBtn" onclick="handleLike(event)" aria-label="點讚並開啟 Instagram">
         <i class="fas fa-heart" aria-hidden="true"></i> 點讚
@@ -1128,6 +1144,7 @@
       </div>
     </div>
 
+    <!-- 社群圖示按鈕 (只有 IG 與 Discord) -->
     <div class="social-links">
       <a href="https://www.instagram.com/longku_lk?vrfl=MWJzMWt4OXRjbGs5aw%3D%3D&utm_source=qr" target="_blank" rel="noopener noreferrer" class="social-btn ig" id="igBtn" onclick="handleIGClick(event)" aria-label="前往 Instagram">
         <i class="fab fa-instagram" aria-hidden="true"></i>
@@ -1282,7 +1299,7 @@
       }
     }
 
-    /* ===== IG 按鈕點擊 (彩色相機動畫) ===== */
+    /* ===== IG 按鈕點擊 ===== */
     function handleIGClick(event) {
       event.preventDefault();
       const url = event.currentTarget.href;
@@ -1294,7 +1311,7 @@
       }, 650);
     }
 
-    /* ===== Discord 按鈕點擊 (全螢幕中央旋轉動畫) ===== */
+    /* ===== Discord 按鈕點擊 ===== */
     let isDcAnimating = false;
 
     function handleDCClick(event) {
